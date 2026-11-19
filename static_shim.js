@@ -4,9 +4,10 @@
 (() => {
   // collect.py의 CATEGORY_SLUGS와 반드시 일치해야 합니다
   const SLUG = {
-    "전체": "all", "AI": "ai", "먹방": "mukbang", "뷰티/패션": "beauty",
-    "브이로그": "vlog", "예능/코미디": "fun", "영화/드라마": "movie",
-    "테크/IT": "tech", "지식/교육": "edu", "여행": "travel", "동물": "animal",
+    "전체": "all", "AI": "ai", "민감성 피부": "sensitive", "스킨케어 루틴": "routine",
+    "성분/제품 리뷰": "review", "피부 고민": "concern", "더마/피부과": "derma",
+    "글로벌 Sensitive": "g-sensitive", "글로벌 Barrier": "g-barrier",
+    "글로벌 K-beauty": "g-kbeauty", "글로벌 Ingredients": "g-ingredients",
   };
   const jsonResp = obj => Promise.resolve(
     new Response(JSON.stringify(obj), { headers: { "Content-Type": "application/json" } }));

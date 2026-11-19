@@ -36,18 +36,19 @@ IMG_CACHE_MAX = 600
 # ---------------------------------------------------------------- 유튜브
 # 카테고리 → 유튜브 검색어 매핑
 CATEGORIES = {
-    "먹방": "먹방",
-    "뷰티/패션": "뷰티 메이크업 패션",
-    "브이로그": "브이로그",
-    "예능/코미디": "예능 웃긴 영상",
-    "영화/드라마": "영화 드라마 리뷰",
-    "테크/IT": "테크 리뷰",
-    "지식/교육": "지식 교양",
-    "여행": "여행",
-    "동물": "강아지 고양이",
+    "민감성 피부": "민감성 피부 스킨케어 진정 장벽",
+    "스킨케어 루틴": "스킨케어 루틴 피부관리 순서",
+    "성분/제품 리뷰": "스킨케어 성분 제품 리뷰 세럼 크림",
+    "피부 고민": "트러블 홍조 아토피 피부 고민 해결",
+    "더마/피부과": "피부과 전문의 더마 화장품 추천",
+    "글로벌 Sensitive": "sensitive skin skincare routine",
+    "글로벌 Barrier": "skin barrier repair dermatologist skincare",
+    "글로벌 K-beauty": "korean skincare routine glass skin",
+    "글로벌 Ingredients": "skincare ingredients review serum moisturizer",
 }
 # "전체" 탭은 아래 카테고리들을 합쳐 조회수순으로 재정렬
-ALL_MERGE = ["먹방", "브이로그", "예능/코미디", "뷰티/패션", "영화/드라마", "여행"]
+ALL_MERGE = ["민감성 피부", "스킨케어 루틴", "성분/제품 리뷰", "피부 고민",
+             "글로벌 Sensitive", "글로벌 Barrier", "글로벌 K-beauty"]
 
 # 검색 필터 protobuf: 업로드 날짜 (2=오늘, 3=이번 주, 4=이번 달)
 PERIOD_CODE = {"day": 2, "week": 3, "month": 4}
