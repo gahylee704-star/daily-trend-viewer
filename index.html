@@ -137,7 +137,7 @@
   <h1>데일리 <span>트렌드</span> 뷰어</h1>
   <div id="today"></div>
   <form id="searchForm">
-    <input id="searchInput" type="search" placeholder="유튜브 검색어 입력 (예: AI 광고)">
+    <input id="searchInput" type="search" placeholder="유튜브 검색어 입력 (예: 민감성 피부 크림)">
     <button id="searchBtn" type="submit">🔍 검색</button>
   </form>
   <button id="refreshBtn">🔄 새로고침</button>
@@ -147,15 +147,16 @@
 <nav class="tabs" id="tabs">
   <button class="tab active" data-tab="youtube">▶ 유튜브</button>
   <button class="tab" data-tab="shorts">⚡ 쇼츠</button>
-  <button class="tab" data-tab="ai">🤖 AI 영상</button>
-  <button class="tab" data-tab="reels">📸 릴스</button>
-  <button class="tab" data-tab="x">𝕏 트위터</button>
-  <button class="tab" data-tab="threads">🧵 스레드</button>
-  <button class="tab" data-tab="tiktok">🎵 틱톡</button>
 </nav>
 
 <div class="toolbar" id="toolbar">
+  <div class="periods" id="regions" style="margin-left:0">
+    <button class="period active" data-region="all">전체</button>
+    <button class="period" data-region="kr">🇰🇷 국내</button>
+    <button class="period" data-region="global">🌍 글로벌</button>
+  </div>
   <div class="chips" id="chips"></div>
+  <span class="sortcount">조회수 1만회 이상만 표시</span>
   <div class="periods" id="periods">
     <button class="period" data-period="day">오늘</button>
     <button class="period active" data-period="week">이번 주</button>
@@ -280,7 +281,7 @@
 </div>
 
 <script>
-const state = { tab: 'youtube', category: '전체', period: 'week', categories: ['전체'], search: '' };
+const state = { tab: 'youtube', category: '전체', period: 'week', categories: ['전체'], search: '', region: 'all' };
 
 const fmt = n => {
   if (n >= 1e8) return (n / 1e8).toFixed(1).replace(/\.0$/, '') + '억회';
@@ -300,7 +301,11 @@ async function initCategories() {
 function renderChips() {
   const box = document.getElementById('chips');
   box.innerHTML = '';
-  state.categories.forEach(c => {
+  const isGlobal = c => c.startsWith('글로벌');
+  const inRegion = c => state.region === 'kr' ? (c === '국내 전체' || !(isGlobal(c) || c === '전체'))
+    : state.region === 'global' ? isGlobal(c)
+    : (c !== '국내 전체' && c !== '글로벌 전체');
+  state.categories.filter(inRegion).forEach(c => {
     const b = document.createElement('button');
     b.className = 'chip' + (c === state.category && !state.search ? ' active' : '');
     b.textContent = c;
@@ -854,6 +859,16 @@ document.getElementById('tabs').onclick = e => {
   else if (state.tab === 'x') loadSocial('x');
   else if (state.tab === 'threads') loadSocial('threads');
   else if (state.tab === 'tiktok') loadTikTok();
+};
+document.getElementById('regions').onclick = e => {
+  const btn = e.target.closest('[data-region]');
+  if (!btn) return;
+  state.region = btn.dataset.region;
+  state.category = { all: '전체', kr: '국내 전체', global: '글로벌 전체' }[state.region];
+  state.search = '';
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('#regions [data-region]').forEach(p => p.classList.toggle('active', p === btn));
+  renderChips(); loadVideos();
 };
 document.getElementById('periods').onclick = e => {
   const btn = e.target.closest('.period');

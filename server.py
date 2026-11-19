@@ -47,8 +47,14 @@ CATEGORIES = {
     "글로벌 Ingredients": "skincare ingredients review serum moisturizer",
 }
 # "전체" 탭은 아래 카테고리들을 합쳐 조회수순으로 재정렬
-ALL_MERGE = ["민감성 피부", "스킨케어 루틴", "성분/제품 리뷰", "피부 고민",
-             "글로벌 Sensitive", "글로벌 Barrier", "글로벌 K-beauty"]
+ALL_MERGE = ["민감성 피부", "스킨케어 루틴", "성분/제품 리뷰", "피부 고민", "더마/피부과",
+             "글로벌 Sensitive", "글로벌 Barrier", "글로벌 K-beauty", "글로벌 Ingredients"]
+# 국내/글로벌 구분: 이름이 "글로벌"로 시작하면 해외 카테고리
+KR_MERGE = ["민감성 피부", "스킨케어 루틴", "성분/제품 리뷰", "피부 고민", "더마/피부과"]
+GLOBAL_MERGE = ["글로벌 Sensitive", "글로벌 Barrier", "글로벌 K-beauty", "글로벌 Ingredients"]
+REGION_ALL = {"전체": ALL_MERGE, "국내 전체": KR_MERGE, "글로벌 전체": GLOBAL_MERGE}
+# 이 조회수 미만 영상은 숨깁니다
+MIN_VIEWS = 10000
 
 # 검색 필터 protobuf: 업로드 날짜 (2=오늘, 3=이번 주, 4=이번 달)
 PERIOD_CODE = {"day": 2, "week": 3, "month": 4}
@@ -260,13 +266,14 @@ def get_videos(category: str, period: str, shorts: bool, force: bool, enrich: bo
     def fetch():
         if query:
             queries = [query]
-        elif category == "전체":
-            queries = [CATEGORIES[c] for c in ALL_MERGE]
+        elif category in REGION_ALL:
+            queries = [CATEGORIES[c] for c in REGION_ALL[category]]
         elif category == "AI":
             queries = AI_YT_QUERIES
         else:
             queries = [CATEGORIES.get(category, category)]
-        vids = merge_yt_searches(queries, period, shorts)
+        vids = [v for v in merge_yt_searches(queries, period, shorts)
+                if (v.get("views") or 0) >= MIN_VIEWS]
         if enrich:
             enrich_likes(vids)
         return vids
@@ -792,7 +799,7 @@ class Handler(BaseHTTPRequestHandler):
             shorts = qs.get("shorts", ["0"])[0] == "1"
             enrich = qs.get("enrich", ["0"])[0] == "1"
             query = qs.get("q", [""])[0].strip()
-            if not query and category not in ("전체", "AI") and category not in CATEGORIES:
+            if not query and category not in ("AI", *REGION_ALL) and category not in CATEGORIES:
                 self._send(400, {"error": "unknown category"})
                 return
             videos, fetched_at = get_videos(category, period, shorts, force, enrich, query)
@@ -800,7 +807,7 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/categories":
-            self._send(200, {"categories": ["전체", "AI"] + list(CATEGORIES.keys())})
+            self._send(200, {"categories": list(REGION_ALL) + list(CATEGORIES.keys())})
             return
 
         if parsed.path == "/api/reels":

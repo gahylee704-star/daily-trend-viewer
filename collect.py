@@ -24,7 +24,7 @@ PAGES_BASE = os.environ.get("PAGES_BASE", "https://lmorejh.github.io/daily-trend
 
 # static_shim.js의 SLUG와 반드시 일치해야 합니다 (파일명에 쓸 영문 슬러그)
 CATEGORY_SLUGS = {
-    "전체": "all", "AI": "ai", "민감성 피부": "sensitive", "스킨케어 루틴": "routine",
+    "전체": "all", "국내 전체": "all-kr", "글로벌 전체": "all-global", "민감성 피부": "sensitive", "스킨케어 루틴": "routine",
     "성분/제품 리뷰": "review", "피부 고민": "concern", "더마/피부과": "derma",
     "글로벌 Sensitive": "g-sensitive", "글로벌 Barrier": "g-barrier",
     "글로벌 K-beauty": "g-kbeauty", "글로벌 Ingredients": "g-ingredients",
@@ -139,49 +139,16 @@ def build_site():
 
 
 def main():
-    assert set(CATEGORY_SLUGS) == {"전체", "AI", *server.CATEGORIES}, \
+    assert set(CATEGORY_SLUGS) == {*server.REGION_ALL, *server.CATEGORIES}, \
         "server.py 카테고리가 바뀌었습니다. CATEGORY_SLUGS를 갱신하세요."
     t0 = time.time()
     os.makedirs(os.path.join(OUT, "data"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "img"), exist_ok=True)
 
-    write_json("categories.json", {"categories": ["전체", "AI"] + list(server.CATEGORIES)})
+    write_json("categories.json", {"categories": list(server.REGION_ALL) + list(server.CATEGORIES)})
     collect_videos()
 
-    reels, accounts, fetched = server.get_reels(False)
-    reels = reels[:80]
-    n = download_images(reels, "thumbnail")
-    data = carry_forward("reels.json", "reels",
-                         {"reels": reels, "accounts": accounts, "fetchedAt": fetched})
-    write_json("reels.json", data)
-    print("릴스: %d개 (썸네일 %d개)" % (len(data["reels"]), n))
-
-    posts, accounts, fetched = server.get_x_posts(False)
-    n = download_images(posts, "media")
-    data = carry_forward("x.json", "posts",
-                         {"posts": posts, "accounts": accounts, "fetchedAt": fetched})
-    write_json("x.json", data)
-    print("X: %d개 (이미지 %d개)" % (len(data["posts"]), n))
-
-    posts, accounts, fetched = server.get_threads_posts(False)
-    n = download_images(posts, "media")
-    data = carry_forward("threads.json", "posts",
-                         {"posts": posts, "accounts": accounts, "fetchedAt": fetched})
-    write_json("threads.json", data)
-    print("스레드: %d개 (이미지 %d개)" % (len(data["posts"]), n))
-
-    posts, accounts, fetched = server.get_tiktok(False)
-    posts = posts[:100]
-    n = download_images(posts, "thumbnail")
-    data = carry_forward("tiktok.json", "posts",
-                         {"posts": posts, "accounts": accounts, "fetchedAt": fetched})
-    write_json("tiktok.json", data)
-    print("틱톡: %d개 (썸네일 %d개)" % (len(data["posts"]), n))
-
-    data, fetched = server.get_ai_data(False)
-    write_json("ai.json", {**data, "fetchedAt": fetched})
-    print("AI: 뉴스 %d건, 모델 %d개" % (len(data["news"]),
-          len(data["models"]["latest"]) + len(data["models"]["trending"])))
+    # 릴스·X·스레드·틱톡·AI 탭은 사용하지 않아 수집하지 않습니다
 
     build_site()
     print("완료: %.0f초, 출력=%s" % (time.time() - t0, OUT))

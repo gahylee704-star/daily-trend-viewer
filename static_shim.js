@@ -4,7 +4,7 @@
 (() => {
   // collect.py의 CATEGORY_SLUGS와 반드시 일치해야 합니다
   const SLUG = {
-    "전체": "all", "AI": "ai", "민감성 피부": "sensitive", "스킨케어 루틴": "routine",
+    "전체": "all", "국내 전체": "all-kr", "글로벌 전체": "all-global", "민감성 피부": "sensitive", "스킨케어 루틴": "routine",
     "성분/제품 리뷰": "review", "피부 고민": "concern", "더마/피부과": "derma",
     "글로벌 Sensitive": "g-sensitive", "글로벌 Barrier": "g-barrier",
     "글로벌 K-beauty": "g-kbeauty", "글로벌 Ingredients": "g-ingredients",
@@ -64,7 +64,7 @@
       "#updated{margin-left:auto}";
     document.head.appendChild(style);
     const badge = document.createElement("div");
-    badge.textContent = "⏱ 1시간마다 자동 수집되는 스냅샷입니다";
+    badge.textContent = "⏱ 매일 오전 9시에 자동 수집되는 스냅샷입니다";
     badge.style.cssText = "color:var(--muted);font-size:12px";
     document.getElementById("updated").after(badge);
   });
