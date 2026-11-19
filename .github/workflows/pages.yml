@@ -36,3 +36,15 @@ jobs:
       - name: Pages 배포
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: 슬랙 알림 (성공)
+        if: success() && github.event_name != 'push'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PAGES_URL: ${{ steps.deployment.outputs.page_url }}
+        run: python3 notify_slack.py _site
+      - name: 슬랙 알림 (실패)
+        if: failure() && github.event_name != 'push'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python3 notify_slack.py _site --fail
